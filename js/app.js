@@ -1,18 +1,17 @@
   // these need to be accessed inside more than one function so we'll declare them first
   let container;
   let camera;
+  let controls;
   let renderer;
   let scene;
   let mesh;
 
   function init() {
 
-    container = document.querySelector( '#scene-container' );
-
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0x8FBCD4 );
-
+    createContainer();
+    createScene();
     createCamera();
+    createControls();
     createLights();
     createMeshes();
     createRenderer();
@@ -26,6 +25,15 @@
 
   }
 
+  function createContainer() {
+    container = document.querySelector( '#scene-container' );
+  };
+
+  function createScene() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color( 0x8FBCD4 );
+  };
+
   function createCamera() {
 
     camera = new THREE.PerspectiveCamera(
@@ -36,22 +44,31 @@
       100, // far clipping plane
     );
 
-    camera.position.set( 0, 0, 10 );
+    camera.position.set( 4, -4, 10 );
 
   }
 
-  function createLights() {
+  function createControls() {
 
-    // Create a directional light
-    const light = new THREE.DirectionalLight( 0xffffff, 3.0 );
+  controls = new THREE.OrbitControls( camera, container );
 
-    // move the light back and up a bit
-    light.position.set( 10, 10, 10 );
+}
 
-    // remember to add the light to the scene
-    scene.add( light );
+ function createLights() {
 
-  }
+  const ambientLight = new THREE.HemisphereLight(
+    0xddeeff, // sky color
+    0x202020, // ground color
+    5, // intensity
+  );
+
+  const mainLight = new THREE.DirectionalLight( 0xffffff, 5 );
+  mainLight.position.set( 10, 10, 10 );
+
+  scene.add( ambientLight, mainLight );
+
+}
+
 
   function createMeshes() {
 
@@ -84,6 +101,8 @@
     renderer.gammaFactor = 2.2;
     renderer.gammaOutput = true;
 
+    renderer.physicallyCorrectLights = true;
+
     container.appendChild( renderer.domElement );
 
   }
@@ -93,10 +112,6 @@
   // avoid heavy computation here
   function update() {
 
-    // increase the mesh's rotation each frame
-    mesh.rotation.z += 0.01;
-    mesh.rotation.x += 0.01;
-    mesh.rotation.y += 0.01;
 
   }
 
